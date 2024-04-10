@@ -1,0 +1,228 @@
+﻿@page "/"
+@using LISTAS.MODELS
+@using LISTAS.SERVICES
+
+<style>
+
+    body {
+        background-color: #151D28;
+        color: white;
+    }
+
+    .logo-container {
+        position: absolute;
+        top: 10px;
+        right: 100px;
+        width: 200px;
+        height: 200px;
+    }
+
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+
+    .button-19 {
+        appearance: button;
+        background-color: ;
+        border: solid transparent;
+        border-radius: 8px;
+        border-width: 0 0 2px;
+        box-sizing: border-box;
+        color: #FFFFFF;
+        cursor: pointer;
+        display: inline-block;
+        font-family: din-round,sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .8px;
+        line-height: 16px;
+        margin: 5px;
+        outline: none;
+        overflow: visible;
+        padding: 10px 12px;
+        text-align: center; 
+        text-transform: uppercase;
+        touch-action: manipulation;
+        transform: translateZ(0);
+        transition: filter .2s;
+        user-select: none;
+        -webkit-user-select: none;
+        vertical-align: middle;
+        white-space: nowrap;
+        width: 120px; 
+    }
+
+        .button-19:after {
+            background-clip: padding-box;
+            background-color: ;
+            border: solid transparent;
+            border-radius: 8px;
+            border-width: 0 0 2px;
+            bottom: -2px;
+            content: "";
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            z-index: -1;
+        }
+
+        .button-19:main,
+        .button-19:focus {
+            user-select: auto;
+        }
+
+        .button-19:hover:not(:disabled) {
+            filter: brightness(1.1);
+            -webkit-filter: brightness(1.1);
+        }
+
+        .button-19:disabled {
+            cursor: auto;
+        }
+
+        .button-19:active {
+            border-width: 2px 0 0;
+            background: none;
+        }
+
+    .button-container {
+        text-align: center; 
+    }
+
+</style>
+
+<div class="logo-container">
+    <img src="/logogrupo.jpg" alt="Logo" />
+</div>
+<PageTitle>Video Player</PageTitle>
+
+<div Class="d-flex justify-content-center">
+    <iframe src="@YoutubeID" width="800" height="400" frameborder="0" allowfullscreen>
+    </iframe>
+</div>
+
+<div class="d-flex justify-content-center mb-2">
+    <button @onclick="First" class="me-2 btn button-19" style="background-color: #FF5733">Primero</button>
+    <button @onclick="Before" class="me-2 btn button-19" style="background-color: #FFC300">Anterior</button>
+    <button @onclick="Next" class="me-2 btn button-19" style="background-color: #DA70D6">Siguiente</button>
+    <button @onclick="Last" class="me-2 btn button-19" style="background-color: #4CAF50">Final</button>
+    <button class="me-2 btn button-19" @onclick="Save" style="background-color: #87cefa">Guardar</button>
+    <button class="me-2 btn button-19" @onclick="SaveAtEnd" style="background-color: #ffa07a">Guardar al final</button>
+</div>
+
+<div class="row">
+    <input class="form-control" type="text" @bind-value="YoutubeLink" />
+
+    <button class="btn btn-primary" @onclick="DeleteFirst">Eliminar al inicio</button>
+    <button class="btn btn-danger" @onclick="DeleteLast">Eliminar al final</button>
+</div>
+
+<h4>Lista de Videos</h4>
+<ul>
+    @foreach (var node in lista.GetNodesWithPositions())
+    {
+        <li>@node.Position: @node.VideoName</li>
+    }
+</ul>
+
+@code
+{
+    Led lista;
+    string YoutubeLink = string.Empty;
+    string YoutubeID = string.Empty;
+    string Mensaje = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        lista = new Led();
+    }
+
+    void PlayVideo()
+    {
+        if (lista.NodoActual is not null)
+        {
+            YoutubeLink = lista.NodoActual.Informacion;
+
+            var videoId = GetVideoID(YoutubeLink);
+
+            if (!string.IsNullOrEmpty(videoId))
+            {
+                YoutubeID = $"https://www.youtube.com/embed/{videoId}";
+            }
+
+        }
+    }
+
+    string? GetVideoID(string link)
+    {
+        var uri = new Uri(link);
+        var query = uri.Query;
+        var queryparams = System.Web.HttpUtility.ParseQueryString(query);
+
+        var VideoID = queryparams["v"];
+
+        return VideoID;
+    }
+
+    void First()
+    {
+        lista.NodoActual = lista.PrimerNodo;
+        PlayVideo();
+    }
+
+    void Last()
+    {
+        lista.NodoActual = lista.UltimoNodo;
+        PlayVideo();
+    }
+
+    void Next()
+    {
+        lista.Siguiente();
+        PlayVideo();
+    }
+
+    void Before()
+    {
+        lista.Anterior();
+        PlayVideo();
+    }
+
+    void Save()
+    {
+        var nuevoNodo = new Nodo(YoutubeLink);
+
+        Mensaje = lista.AgregarNodoAlInicio(nuevoNodo);
+
+        PlayVideo();
+
+        YoutubeLink = string.Empty;
+    }
+
+    void SaveAtEnd()
+    {
+        var nuevoNodo = new Nodo(YoutubeLink);
+
+        Mensaje = lista.AgregarNodoAlFinal(nuevoNodo);
+
+        PlayVideo();
+
+        YoutubeLink = string.Empty;
+    }
+
+    void DeleteFirst()
+    {
+        Mensaje = lista.EliminarNodoAlInicio();
+        PlayVideo();
+    }
+
+    void DeleteLast()
+    {
+        Mensaje = lista.EliminarNodoAlFinal();
+        PlayVideo();
+    }
+}
