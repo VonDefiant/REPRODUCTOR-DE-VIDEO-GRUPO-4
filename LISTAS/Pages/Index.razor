@@ -3,7 +3,6 @@
 @using LISTAS.SERVICES
 
 <style>
-
     body {
         background-color: #151D28;
         color: white;
@@ -11,7 +10,7 @@
 
     .logo-container {
         position: absolute;
-        top: 10px;
+        top: 100px;
         right: 100px;
         width: 200px;
         height: 200px;
@@ -23,10 +22,9 @@
             object-fit: contain;
         }
 
-
     .button-19 {
         appearance: button;
-        background-color: ;
+        background-color:;
         border: solid transparent;
         border-radius: 8px;
         border-width: 0 0 2px;
@@ -43,7 +41,7 @@
         outline: none;
         overflow: visible;
         padding: 10px 12px;
-        text-align: center; 
+        text-align: center;
         text-transform: uppercase;
         touch-action: manipulation;
         transform: translateZ(0);
@@ -52,12 +50,17 @@
         -webkit-user-select: none;
         vertical-align: middle;
         white-space: nowrap;
-        width: 120px; 
+        width: 150px;
     }
 
+        .button-19.large-button {
+            width: 150px; 
+       font-size: 14px; 
+            padding: 12px 15px;
+        }
         .button-19:after {
             background-clip: padding-box;
-            background-color: ;
+            background-color:;
             border: solid transparent;
             border-radius: 8px;
             border-width: 0 0 2px;
@@ -90,9 +93,8 @@
         }
 
     .button-container {
-        text-align: center; 
+        text-align: center;
     }
-
 </style>
 
 <div class="logo-container">
@@ -121,6 +123,11 @@
     <button class="btn btn-danger" @onclick="DeleteLast">Eliminar al final</button>
 </div>
 
+<div class="row">
+    <input type="number" @bind="PositionToDelete" placeholder="Posición" />
+    <button class="btn btn-warning" @onclick="DeleteAtPosition">Eliminar en Posición</button>
+</div>
+
 <h4>Lista de Videos</h4>
 <ul>
     @foreach (var node in lista.GetNodesWithPositions())
@@ -135,6 +142,8 @@
     string YoutubeLink = string.Empty;
     string YoutubeID = string.Empty;
     string Mensaje = string.Empty;
+    int PositionToAdd { get; set; }
+    int PositionToDelete { get; set; }
 
     protected override void OnInitialized()
     {
@@ -223,6 +232,13 @@
     void DeleteLast()
     {
         Mensaje = lista.EliminarNodoAlFinal();
+        PlayVideo();
+    }
+
+
+    void DeleteAtPosition()
+    {
+        Mensaje = lista.EliminarNodoEnPosicion(PositionToDelete);
         PlayVideo();
     }
 }

@@ -110,6 +110,92 @@ namespace LISTAS.SERVICES
             return "Nodo eliminado del final de la lista";
         }
 
+        public string AgregarNodoEnPosicion(Nodo nuevoNodo, int position)
+        {
+            if (position <= 0)
+            {
+                return "La posición debe ser un número positivo mayor que cero.";
+            }
+
+            if (position == 1)
+            {
+                return AgregarNodoAlInicio(nuevoNodo);
+            }
+
+            var currentNode = PrimerNodo;
+            int currentPosition = 1;
+
+            while (currentNode != null && currentPosition < position - 1)
+            {
+                currentNode = currentNode.LigaSiguiente;
+                currentPosition++;
+            }
+
+            if (currentNode == null)
+            {
+                return "La posición especificada está más allá del final de la lista.";
+            }
+
+            nuevoNodo.LigaSiguiente = currentNode.LigaSiguiente;
+            nuevoNodo.LigaAnterior = currentNode;
+            currentNode.LigaSiguiente = nuevoNodo;
+
+            if (nuevoNodo.LigaSiguiente != null)
+            {
+                nuevoNodo.LigaSiguiente.LigaAnterior = nuevoNodo;
+            }
+            else
+            {
+                UltimoNodo = nuevoNodo;
+            }
+
+            NodoActual = nuevoNodo;
+            return $"Nodo agregado en la posición {position} de la lista";
+        }
+
+        public string EliminarNodoEnPosicion(int position)
+        {
+            if (IsEmpty)
+            {
+                return "La lista está vacía, no se puede eliminar ningún nodo.";
+            }
+
+            if (position <= 0)
+            {
+                return "La posición debe ser un número positivo mayor que cero.";
+            }
+
+            if (position == 1)
+            {
+                return EliminarNodoAlInicio();
+            }
+
+            var currentNode = PrimerNodo;
+            int currentPosition = 1;
+
+            while (currentNode != null && currentPosition < position)
+            {
+                currentNode = currentNode.LigaSiguiente;
+                currentPosition++;
+            }
+
+            if (currentNode == null)
+            {
+                return "La posición especificada está más allá del final de la lista.";
+            }
+
+            if (currentNode == UltimoNodo)
+            {
+                return EliminarNodoAlFinal();
+            }
+
+            currentNode.LigaAnterior.LigaSiguiente = currentNode.LigaSiguiente;
+            currentNode.LigaSiguiente.LigaAnterior = currentNode.LigaAnterior;
+
+            NodoActual = PrimerNodo;
+            return $"Nodo en la posición {position} eliminado de la lista";
+        }
+
         public IEnumerable<(int Position, string VideoName)> GetNodesWithPositions()
         {
             var currentNode = PrimerNodo;
